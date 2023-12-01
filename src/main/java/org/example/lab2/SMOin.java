@@ -5,7 +5,7 @@ import java.util.Random;
 public class SMOin {
     Random random;
     int  MeanServeTime, NumServers;
-    double MeanIATime;
+    public double MeanIATime;
 
 
     public SMOin() {
