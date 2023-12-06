@@ -10,12 +10,12 @@ public class SMOin {
 
     public SMOin() {
         random = new Random();
-//        MeanIATime = random.nextInt(7) + 1;
-        MeanIATime = 7;
-        MeanServeTime = 10;
-//        MeanServeTime = random.nextInt(10) + 1;
-        NumServers = 3;
-//        NumServers = random.nextInt(12) + 1;
+//        MeanIATime = 7;
+//        MeanServeTime = 10;
+//        NumServers = 3;
+        MeanIATime = random.nextInt(7) + 1;
+        MeanServeTime = random.nextInt(10) + 1;
+        NumServers = random.nextInt(12) + 1;
     }
 
 }

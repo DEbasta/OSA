@@ -178,7 +178,7 @@ public class SMO {
         else {
             NumInQ = NumInQ - 1;
 
-            TimeInQ = ClockTime - TimeOfArrival[1];
+            TimeInQ = ClockTime - TimeOfArrival[0];
 
             if (TimeInQ > MaxTimeInQu) {
                 MaxTimeInQu = TimeInQ;
@@ -186,7 +186,7 @@ public class SMO {
 
             SumOfQTimes = SumOfQTimes + TimeInQ;
 
-            TimeOfNextEvent[FinishedServer] = ClockTime - genTime(smoIn.MeanServeTime);
+            TimeOfNextEvent[FinishedServer] = ClockTime + genTime(smoIn.MeanServeTime);
         }
 
         for (int i = 1; i < NumInQ; ++i) {
