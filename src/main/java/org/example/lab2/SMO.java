@@ -12,15 +12,15 @@ public class SMO {
 
 
     double ClockTime, AvgNumInQue, AvgTimeInQue, MaxTimeInQu, TotalTimeInQ, TotalTimeBusy,
-            TimeOfLastEvent, SumOfQTimes;
+            TimeOfLastEvent, SumOfQTimes, AvgServersBusyPercent, NumLostPercent ;
 
     double[] QTimeArray, TimeOfNextEvent, TimeOfArrival;
     boolean[] EventScheduled;
 
 
-    public SMO(){
+    public SMO(SMOin smoIn){
         random = new Random();
-        smoIn = new SMOin();
+        this.smoIn = smoIn;
         smoIn.MeanIATime = 1/smoIn.MeanIATime;
         EventScheduled = new boolean[smoIn.NumServers + 1];
         TimeOfNextEvent = new double[smoIn.NumServers + 1];
@@ -40,7 +40,12 @@ public class SMO {
         }
         while ((ClockTime < CloseTime) && (NumBusy >= 0));
 
-        Report();
+        AvgTimeInQue = SumOfQTimes / NumServed;
+        AvgNumInQue = TotalTimeInQ / ClockTime;
+        AvgServersBusyPercent = ((TotalTimeBusy / ClockTime)/smoIn.NumServers)*100;
+        NumLostPercent = (double)NumLost/(NumLost + NumServed)*100;
+//
+//        Report();// вывод результатов смо
     }
 
     public double genTime(double value){
@@ -196,20 +201,17 @@ public class SMO {
 
 
     public void Report() {
-        AvgTimeInQue = SumOfQTimes / NumServed;
-        AvgNumInQue = TotalTimeInQ / ClockTime;
+
         System.out.println();
-        double AvgServersBusy;
-        AvgServersBusy = TotalTimeBusy / ClockTime;
         System.out.println("1. Time of last req " + ClockTime);
         System.out.println("2. Avg Time in Q " + AvgTimeInQue);
         System.out.println("3. Max Time in Q " + MaxTimeInQu);
         System.out.println("4. Avg Number In Q " + AvgNumInQue);
         System.out.println("5. Max Number In Q " + MaxNumInQu);
-        System.out.println("6. Avg Servers Busy Percent " + AvgServersBusy / smoIn.NumServers);
+        System.out.println("6. Avg Servers Busy Percent " + AvgServersBusyPercent);
         System.out.println("7. Number of Served " + NumServed);
         System.out.println("8. Number of Lost " + NumLost);
-        System.out.println("9. Percent of Lost " + (double)NumLost/(NumLost + NumServed)*100);
+        System.out.println("9. Percent of Lost " + NumLostPercent);
     }
 
 }
