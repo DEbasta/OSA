@@ -1,53 +1,63 @@
 package org.example.lab2;
 
-import java.util.ArrayList;
 import java.util.Random;
 
 public class SMO {
+    SMOin smoIn;
     Random random;
     final int MaxAllowedInQ = 20;
+    final double CloseTime = 500;
 
     int NextEventType, FinishedServer, NumBusy, NumLost, NumServed, MaxNumInQu, NumInQ;
 
-    final double CloseTime = 500;
 
-    double ClockTime, AvgNumInQue, AvgTimeInQue,
-            MaxTimeInQu, TotalTimeInQ, TotalTimeBusy, TimeOfLastEvent, SumOfQTimes, TimeSinceLastEvent;
+    double ClockTime, AvgNumInQue, AvgTimeInQue, MaxTimeInQu, TotalTimeInQ, TotalTimeBusy,
+            TimeOfLastEvent, SumOfQTimes;
 
-    ArrayList<Double> QTimeArray, TimeOfNextEvent, TimeOfArrival;
-    ArrayList<Boolean> EventScheduled;
+    double[] QTimeArray, TimeOfNextEvent, TimeOfArrival;
+    boolean[] EventScheduled;
 
 
-    SMOin smoIn;
-
-    public SMO() {
+    public SMO(){
         random = new Random();
         smoIn = new SMOin();
-        smoIn.MeanIATime = (double) 1 / smoIn.MeanIATime;
+        smoIn.MeanIATime = 1/smoIn.MeanIATime;
+        EventScheduled = new boolean[smoIn.NumServers + 1];
+        TimeOfNextEvent = new double[smoIn.NumServers + 1];
+
         Init();
         do {
-            System.out.println("do");
-            FindNextEvent();
+            FindNextEvent ();
+
             UpdateStatistics();
+
             if (NextEventType == 1) {
-                System.out.println("Arrival");
                 Arrival();
-            } else {
-                System.out.println("Departure");
+            }
+            else {
                 Departure(FinishedServer);
             }
-            System.out.println(ClockTime);
         }
-        while ((Math.abs(ClockTime) < CloseTime));
-        System.out.println("Report In");
-        System.out.println();
+        while ((ClockTime < CloseTime) && (NumBusy >= 0));
+
         Report();
     }
 
-    public void Init() {
+    public double genTime(double value){
+        Random random = new Random();
+        double d;
+        d = -value * Math.log(random.nextDouble());
+        while (Double.isNaN(d))
+            d = -value * Math.log(random.nextDouble());
+        return d;
+    }
+
+    public void Init(){
+        ClockTime = 0;
         NumBusy = 0;
         NumInQ = 0;
         TimeOfLastEvent = 0;
+
         NumServed = 0;
         NumLost = 0;
         SumOfQTimes = 0;
@@ -55,38 +65,35 @@ public class SMO {
         TotalTimeInQ = 0;
         MaxNumInQu = 0;
         TotalTimeBusy = 0;
-        QTimeArray = new ArrayList<>();
-        EventScheduled = new ArrayList<>();
-        TimeOfNextEvent = new ArrayList<>();
-        QTimeArray.add(0.0);
-        EventScheduled.add(true);
-        TimeOfNextEvent.add(genTimeOfNextEvent());
-        for (int i = 1; i < smoIn.NumServers; ++i) {
-            EventScheduled.add(false);
-        }
-    }
+        QTimeArray = new double[1]; //this could fuck whole thing up
+        TimeOfArrival = new double[MaxNumInQu];
+        QTimeArray[0] = 0;
 
-    public double genTimeOfNextEvent(){
-        Random random = new Random();
-        double d;
-        d = -smoIn.MeanIATime * Math.log(random.nextInt());
-        while (Double.isNaN(d))
-            d = -smoIn.MeanIATime * Math.log(random.nextInt());
-        return d;
+        EventScheduled[0] = true;
+        TimeOfNextEvent[0] = genTime(smoIn.MeanIATime);
+
+        for (int i = 1; i < smoIn.NumServers; ++i) {
+            EventScheduled[i] = false;
+        }
     }
 
     public void FindNextEvent() {
         double NextEventTime;
         NextEventTime = 10 * CloseTime;
+
         for (int i=0; i < smoIn.NumServers; ++i) {
-            if (EventScheduled.get(i)) {
-                if (TimeOfNextEvent.get(i) < NextEventTime)
-                    NextEventTime = TimeOfNextEvent.get(i);
-                if (i == 0)
-                    NextEventType = 1;
-                else {
-                    NextEventType = 2;
-                    FinishedServer = i;
+
+            if (EventScheduled[i]) {
+
+                if (TimeOfNextEvent[i] < NextEventTime) {
+                    NextEventTime = TimeOfNextEvent[i];
+
+                    if (i == 0)
+                        NextEventType = 1;
+                    else {
+                        NextEventType = 2;
+                        FinishedServer = i;
+                    }
                 }
             }
         }
@@ -94,89 +101,96 @@ public class SMO {
     }
 
     public void UpdateStatistics() {
+        double TimeSinceLastEvent;
         TimeSinceLastEvent = ClockTime - TimeOfLastEvent;
-        QTimeArray.set(NumInQ,QTimeArray.get(NumInQ) + TimeSinceLastEvent);
-        TotalTimeInQ = TotalTimeInQ + NumInQ * Math.abs(TimeSinceLastEvent);
+
+        QTimeArray[NumInQ] = QTimeArray[NumInQ] + TimeSinceLastEvent;
+        TotalTimeInQ = TotalTimeInQ + NumInQ * TimeSinceLastEvent;
         TotalTimeBusy = TotalTimeBusy + NumBusy * TimeSinceLastEvent;
+
         TimeOfLastEvent = ClockTime;
     }
 
+    public void PreserveQTimeArray(){
+        double [] tmpArr = new double[MaxNumInQu + 1];
+        System.arraycopy(QTimeArray, 0, tmpArr, 0, QTimeArray.length);
+        QTimeArray = tmpArr;
+    }
+
+    public void PreserveTimeOfArrival(){
+        double [] tmpArr = new double[MaxNumInQu];
+        for (int i = 1; i < TimeOfArrival.length;++i) {
+            tmpArr[i-1] = TimeOfArrival[i];
+        }
+        TimeOfArrival = tmpArr;
+    }
+
     public void Arrival() {
-        TimeOfArrival = new ArrayList<>();
-        TimeOfNextEvent.set(0, ClockTime + genTimeOfNextEvent());
-        if (TimeOfNextEvent.get(0) > CloseTime)
-            EventScheduled.set(0, false);
-        if (NumInQ == MaxAllowedInQ) {
+        TimeOfNextEvent[0] = ClockTime + genTime(smoIn.MeanIATime);
+
+        if (TimeOfNextEvent[0] > CloseTime ) {
+            EventScheduled[0] = false;
+        }
+
+        if (NumInQ == MaxAllowedInQ ) {
             NumLost = NumLost + 1;
             return;
         }
 
-        ArrayList<Double> tmpArr;
-        ArrayList<Double> tmpArr2;
         if (NumBusy == smoIn.NumServers) {
+
             NumInQ = NumInQ + 1;
-            System.out.println("num = " + NumInQ);
+
             if (NumInQ > MaxNumInQu) {
                 MaxNumInQu = NumInQ;
-                tmpArr = new ArrayList<>(MaxNumInQu + 1);
-                tmpArr2 = new ArrayList<>(MaxNumInQu);
-                if (QTimeArray.size() > (MaxNumInQu + 1))
-                    for (int i = 0; i < (MaxNumInQu + 1); ++i)
-                        tmpArr.add(QTimeArray.get(i));
-                else {
-                    for (int i = 0; i < (MaxNumInQu + 1); ++i)
-                        if (i < QTimeArray.size())
-                            tmpArr.add(QTimeArray.get(i));
-                        else tmpArr.add(null);
-                }
-                if (TimeOfArrival.size() > MaxNumInQu)
-                    for (int i = 0; i < MaxNumInQu; ++i)
-                        tmpArr2.add(TimeOfArrival.get(i));
-                else {
-                    for (int i = 0; i < MaxNumInQu; ++i)
-                        if (i < TimeOfArrival.size())
-                            tmpArr2.add(TimeOfArrival.get(i));
-                        else tmpArr2.add(null);
-                }
-
-                QTimeArray = (ArrayList<Double>) tmpArr.clone();
-                TimeOfArrival = (ArrayList<Double>) tmpArr2.clone();
-
-                TimeOfArrival.add(NumInQ, ClockTime);
+                PreserveQTimeArray();
+                PreserveTimeOfArrival();
             }
+
+            TimeOfArrival[NumInQ-1] = ClockTime;
         }
+
         else {
             NumBusy = NumBusy + 1;
-            for (int i = 0; i < smoIn.NumServers; ++i) {
-                if (!EventScheduled.get(i)) {
-                    EventScheduled.set(i, true);
-                    TimeOfNextEvent.add(i,ClockTime + genTimeOfNextEvent());
+
+            for (int i = 1; i < smoIn.NumServers; ++i) {
+                if (!EventScheduled[i]) {
+                    EventScheduled[i] = true;
+                    TimeOfNextEvent[i] = ClockTime + genTime(smoIn.MeanServeTime);
                     break;
                 }
             }
-        }
 
+        }
     }
+
     public void Departure(int FinishedServer){
         double TimeInQ;
         NumServed = NumServed + 1;
-        if (NumInQ == 0){
+        if (NumInQ == 0) {
+
             if (NumBusy > 0)
-                NumBusy--;
-            else NumBusy = 0;
-            EventScheduled.set(FinishedServer, false);
+                NumBusy = NumBusy - 1;
+            else
+                NumBusy = 0;
+            EventScheduled[FinishedServer] = false;
         }
         else {
             NumInQ = NumInQ - 1;
-            TimeInQ = ClockTime - TimeOfArrival.get(1);
+
+            TimeInQ = ClockTime - TimeOfArrival[1];
+
             if (TimeInQ > MaxTimeInQu) {
                 MaxTimeInQu = TimeInQ;
             }
 
-            SumOfQTimes += TimeInQ;
-            TimeOfNextEvent.set(FinishedServer,ClockTime + genTimeOfNextEvent());
-            for (int i = 1; i < NumInQ; ++i)
-                TimeOfArrival.set(i, TimeOfArrival.get(i + 1));
+            SumOfQTimes = SumOfQTimes + TimeInQ;
+
+            TimeOfNextEvent[FinishedServer] = ClockTime - genTime(smoIn.MeanServeTime);
+        }
+
+        for (int i = 1; i < NumInQ; ++i) {
+            TimeOfArrival[i] = TimeOfArrival[i + 1];
         }
     }
 
@@ -184,23 +198,18 @@ public class SMO {
     public void Report() {
         AvgTimeInQue = SumOfQTimes / NumServed;
         AvgNumInQue = TotalTimeInQ / ClockTime;
-        System.out.println(TotalTimeInQ);
         System.out.println();
         double AvgServersBusy;
         AvgServersBusy = TotalTimeBusy / ClockTime;
-
-        System.out.println(ClockTime);
-        System.out.println(NumServed);
-        System.out.println(AvgTimeInQue);
-        System.out.println(MaxTimeInQu);
-        System.out.println(AvgNumInQue);
-        System.out.println(MaxNumInQu);
-        System.out.println(AvgServersBusy / smoIn.NumServers);
-        System.out.println(NumLost);
-        System.out.println(NumLost/(NumLost + NumServed));
+        System.out.println("1. Time of last req " + ClockTime);
+        System.out.println("2. Avg Time in Q " + AvgTimeInQue);
+        System.out.println("3. Max Time in Q " + MaxTimeInQu);
+        System.out.println("4. Avg Number In Q " + AvgNumInQue);
+        System.out.println("5. Max Number In Q " + MaxNumInQu);
+        System.out.println("6. Avg Servers Busy Percent " + AvgServersBusy / smoIn.NumServers);
+        System.out.println("7. Number of Served " + NumServed);
+        System.out.println("8. Number of Lost " + NumLost);
+        System.out.println("9. Percent of Lost " + (double)NumLost/(NumLost + NumServed)*100);
     }
 
-
-
 }
-

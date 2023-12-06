@@ -171,10 +171,10 @@ Sub Departure(FinishedServer As Integer)
 
     If NumInQ = 0 Then
 
-        If NumBusy > 0 Then    ' ...
+        If NumBusy > 0 Then
         NumBusy = NumBusy - 1
-        Else: NumBusy = 0      ' ...
-        End If                 ' ...
+        Else: NumBusy = 0
+        End If
         
         
         EventScheduled(FinishedServer) = False
