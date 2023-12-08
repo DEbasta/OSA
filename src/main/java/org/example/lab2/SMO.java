@@ -30,7 +30,6 @@ public class SMO {
             FindNextEvent ();
 
             UpdateStatistics();
-
             if (NextEventType == 1) {
                 Arrival();
             }
@@ -51,9 +50,9 @@ public class SMO {
     public double genTime(double value){
         Random random = new Random();
         double d;
-        d = -value * Math.log(random.nextDouble());
+        d = value * Math.log(random.nextDouble());
         while (Double.isNaN(d))
-            d = -value * Math.log(random.nextDouble());
+            d = value * Math.log(random.nextDouble());
         return d;
     }
 
@@ -75,7 +74,7 @@ public class SMO {
         QTimeArray[0] = 0;
 
         EventScheduled[0] = true;
-        TimeOfNextEvent[0] = genTime(smoIn.MeanIATime);
+        TimeOfNextEvent[0] = -genTime(smoIn.MeanIATime);
 
         for (int i = 1; i < smoIn.NumServers; ++i) {
             EventScheduled[i] = false;
@@ -131,7 +130,7 @@ public class SMO {
     }
 
     public void Arrival() {
-        TimeOfNextEvent[0] = ClockTime + genTime(smoIn.MeanIATime);
+        TimeOfNextEvent[0] = ClockTime - genTime(smoIn.MeanIATime);
 
         if (TimeOfNextEvent[0] > CloseTime ) {
             EventScheduled[0] = false;
@@ -161,7 +160,7 @@ public class SMO {
             for (int i = 1; i < smoIn.NumServers; ++i) {
                 if (!EventScheduled[i]) {
                     EventScheduled[i] = true;
-                    TimeOfNextEvent[i] = ClockTime + genTime(smoIn.MeanServeTime);
+                    TimeOfNextEvent[i] = ClockTime - genTime(smoIn.MeanServeTime);
                     break;
                 }
             }
@@ -191,7 +190,7 @@ public class SMO {
 
             SumOfQTimes = SumOfQTimes + TimeInQ;
 
-            TimeOfNextEvent[FinishedServer] = ClockTime + genTime(smoIn.MeanServeTime);
+            TimeOfNextEvent[FinishedServer] = ClockTime - genTime(smoIn.MeanServeTime);
         }
 
         for (int i = 1; i < NumInQ; ++i) {
