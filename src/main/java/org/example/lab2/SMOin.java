@@ -18,4 +18,19 @@ public class SMOin {
         NumServers = random.nextInt(12) + 1;
     }
 
+    public int getNumServers() {
+        return NumServers;
+    }
+
+    public double getMeanServeTime() {
+        return MeanServeTime;
+    }
+
+    public double getMeanIATime() {
+        return MeanIATime;
+    }
+
+    public void setMeanIATime(double meanIATime) {
+        MeanIATime = meanIATime;
+    }
 }

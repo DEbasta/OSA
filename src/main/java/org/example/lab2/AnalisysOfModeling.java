@@ -6,13 +6,14 @@ public class AnalisysOfModeling {
     final int genHugeAmount = 100, genFinAmount = 30;
     boolean bordersReady = true;
     ArrayList<ArrayList> hugeTab, finTab;
-    ArrayList<Double> Arr1, Arr2, Arr3, Arr4, Arr5, Arr6, Arr7, Arr8, Arr9, Borders, Fin1, Fin2, Fin3, Fin4, Fin5;
+    ArrayList<Double> Arr1, Arr2, Arr3, Arr4, Arr5, Arr6, Arr7, Arr8, Arr9, Borders, Fin1, Fin2, Fin3, Fin4, Fin5,
+            Fin6, Fin7, Fin8, Fin9, Fin10, Fin11;
 
     double [][] MatrixCorrel;
 
     public AnalisysOfModeling(){
         genHugeTab();
-        genFinTab();
+        genSecondTab();
     }
 
     public void genHugeTab(){
@@ -233,77 +234,97 @@ public class AnalisysOfModeling {
             Borders = retList;
     }
 
-    public void genFinTab() {
+    public void genSecondTab() {
         if (Borders != null) {
             Fin1 = new ArrayList<>();
             Fin2 = new ArrayList<>();
             Fin3 = new ArrayList<>();
             Fin4 = new ArrayList<>();
             Fin5 = new ArrayList<>();
+            Fin6 = new ArrayList<>();
+            Fin7 = new ArrayList<>();
+            Fin8 = new ArrayList<>();
+            Fin9 = new ArrayList<>();
+            Fin10 = new ArrayList<>();
+            Fin11 = new ArrayList<>();
+
             finTab = new ArrayList<>();
             finTab.add(Fin1);
             finTab.add(Fin2);
             finTab.add(Fin3);
             finTab.add(Fin4);
             finTab.add(Fin5);
+            finTab.add(Fin6);
+            finTab.add(Fin7);
+            finTab.add(Fin8);
+            finTab.add(Fin9);
+            finTab.add(Fin10);
+            finTab.add(Fin11);
             for (int i = 0; i < genFinAmount; ++i) {
                 SMOin smoIn = new SMOin();
                 SMO smo = new SMO(smoIn);
-                Fin1.add();
-                Fin2.add();
-                Fin3.add();
-                Fin4.add();
-                Fin5.add();
+                Fin1.add(smoIn.getMeanIATime());
+                Fin2.add(smoIn.getMeanServeTime());
+                Fin3.add(Double.valueOf(smoIn.getNumServers()));
+                Fin4.add(Math.pow(smoIn.getMeanIATime(), 2));
+                Fin5.add(smoIn.getMeanIATime() * smoIn.getMeanServeTime());
+                Fin6.add(smoIn.getMeanIATime() * Double.valueOf(smoIn.getNumServers()));
+                Fin7.add(Math.pow(smoIn.getMeanServeTime(), 2));
+                Fin8.add(smoIn.getMeanServeTime() * Double.valueOf(smoIn.getNumServers()));
+                Fin9.add(Math.pow(Double.valueOf(smoIn.getNumServers()), 2));
+                Fin10.add(getParam(smo, (int)Math.round(Borders.get(0))));
+                Fin11.add(getParam(smo, (int)Math.round(Borders.get(2))));
             }
+            printSecondTab();
+        }
+    }
+
+    public void printSecondTab() {
+        for (int i = 0; i < genFinAmount; ++i) {
+            System.out.println(finTab.get(0).get(i) + " " + finTab.get(1).get(i) + " " + finTab.get(2).get(i) + " " +
+                    finTab.get(3).get(i) + " " + finTab.get(4).get(i) + " " + finTab.get(5).get(i) + " " +
+                    finTab.get(6).get(i) + " " + finTab.get(7).get(i) + " " + finTab.get(8).get(i) + " " +
+                    finTab.get(9).get(i) + " " + finTab.get(10).get(i));
         }
     }
 
     public double getParam(SMO smo, int ind){
         double retStatment = 0.0;
-        Arr1.add(smo.ClockTime);
-        Arr2.add(smo.AvgTimeInQue);
-        Arr3.add(smo.MaxTimeInQu);
-        Arr4.add(smo.AvgNumInQue);
-        Arr5.add(Double.valueOf(smo.MaxNumInQu));
-        Arr6.add(smo.AvgServersBusyPercent);
-        Arr7.add(Double.valueOf(smo.NumServed));
-        Arr8.add(Double.valueOf(smo.NumLost));
-        Arr9.add(smo.NumLostPercent);
         switch (ind){
             case (1):{
-                retStatment = smo.ClockTime;
+                retStatment = smo.getClockTime();
                 break;
             }
             case (2):{
-                retStatment = smo.AvgTimeInQue;
+                retStatment = smo.getAvgTimeInQue();
                 break;
             }
             case (3):{
-                retStatment = smo.MaxTimeInQu;
+                retStatment = smo.getMaxTimeInQu();
                 break;
             }
             case (4):{
-                retStatment = smo.AvgNumInQue;
+                retStatment = smo.getAvgNumInQue();
                 break;
             }
             case (5):{
-                retStatment = Double.valueOf(smo.MaxNumInQu);
+                retStatment = Double.valueOf(smo.getMaxNumInQu());
                 break;
             }
             case (6):{
-                retStatment = smo.AvgServersBusyPercent;
+                retStatment = smo.getAvgServersBusyPercent();
                 break;
             }
             case (7):{
-                retStatment = Double.valueOf(smo.NumServed);
+                retStatment = Double.valueOf(smo.getNumServed());
                 break;
             }
             case (8):{
-                retStatment = Double.valueOf(smo.NumLost);
+                retStatment = Double.valueOf(smo.getNumLost());
                 break;
             }
             case (9):{
-                retStatment = smo.NumLostPercent;
+                retStatment = smo.getNumLostPercent();
                 break;
             }
 

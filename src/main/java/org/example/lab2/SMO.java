@@ -21,9 +21,9 @@ public class SMO {
     public SMO(SMOin smoIn){
         random = new Random();
         this.smoIn = smoIn;
-        smoIn.MeanIATime = 1/smoIn.MeanIATime;
-        EventScheduled = new boolean[smoIn.NumServers + 1];
-        TimeOfNextEvent = new double[smoIn.NumServers + 1];
+        smoIn.setMeanIATime(1/smoIn.getMeanIATime());
+        EventScheduled = new boolean[smoIn.getNumServers() + 1];
+        TimeOfNextEvent = new double[smoIn.getNumServers() + 1];
 
         Init();
         do {
@@ -39,9 +39,11 @@ public class SMO {
         }
         while ((ClockTime < CloseTime) && (NumBusy >= 0));
 
+        if (ClockTime == 5000)
+            ClockTime = 500;
         AvgTimeInQue = SumOfQTimes / NumServed;
         AvgNumInQue = TotalTimeInQ / ClockTime;
-        AvgServersBusyPercent = ((TotalTimeBusy / ClockTime)/smoIn.NumServers)*100;
+        AvgServersBusyPercent = ((TotalTimeBusy / ClockTime)/smoIn.getNumServers())*100;
         NumLostPercent = (double)NumLost/(NumLost + NumServed)*100;
 //
 //        Report();// вывод результатов смо
@@ -74,9 +76,9 @@ public class SMO {
         QTimeArray[0] = 0;
 
         EventScheduled[0] = true;
-        TimeOfNextEvent[0] = -genTime(smoIn.MeanIATime);
+        TimeOfNextEvent[0] = -genTime(smoIn.getMeanIATime());
 
-        for (int i = 1; i < smoIn.NumServers; ++i) {
+        for (int i = 1; i < smoIn.getNumServers(); ++i) {
             EventScheduled[i] = false;
         }
     }
@@ -85,7 +87,7 @@ public class SMO {
         double NextEventTime;
         NextEventTime = 10 * CloseTime;
 
-        for (int i=0; i < smoIn.NumServers; ++i) {
+        for (int i=0; i < smoIn.getNumServers(); ++i) {
 
             if (EventScheduled[i]) {
 
@@ -130,7 +132,7 @@ public class SMO {
     }
 
     public void Arrival() {
-        TimeOfNextEvent[0] = ClockTime - genTime(smoIn.MeanIATime);
+        TimeOfNextEvent[0] = ClockTime - genTime(smoIn.getMeanIATime());
 
         if (TimeOfNextEvent[0] > CloseTime ) {
             EventScheduled[0] = false;
@@ -141,7 +143,7 @@ public class SMO {
             return;
         }
 
-        if (NumBusy == smoIn.NumServers) {
+        if (NumBusy == smoIn.getNumServers()) {
 
             NumInQ = NumInQ + 1;
 
@@ -157,10 +159,10 @@ public class SMO {
         else {
             NumBusy = NumBusy + 1;
 
-            for (int i = 1; i < smoIn.NumServers; ++i) {
+            for (int i = 1; i < smoIn.getNumServers(); ++i) {
                 if (!EventScheduled[i]) {
                     EventScheduled[i] = true;
-                    TimeOfNextEvent[i] = ClockTime - genTime(smoIn.MeanServeTime);
+                    TimeOfNextEvent[i] = ClockTime - genTime(smoIn.getMeanServeTime());
                     break;
                 }
             }
@@ -190,7 +192,7 @@ public class SMO {
 
             SumOfQTimes = SumOfQTimes + TimeInQ;
 
-            TimeOfNextEvent[FinishedServer] = ClockTime - genTime(smoIn.MeanServeTime);
+            TimeOfNextEvent[FinishedServer] = ClockTime - genTime(smoIn.getMeanServeTime());
         }
 
         for (int i = 1; i < NumInQ; ++i) {
@@ -200,7 +202,6 @@ public class SMO {
 
 
     public void Report() {
-
         System.out.println();
         System.out.println("1. Time of last req " + ClockTime);
         System.out.println("2. Avg Time in Q " + AvgTimeInQue);
@@ -213,4 +214,39 @@ public class SMO {
         System.out.println("9. Percent of Lost " + NumLostPercent);
     }
 
+    public double getClockTime() {
+        return ClockTime;
+    }
+
+    public double getAvgTimeInQue() {
+        return AvgTimeInQue;
+    }
+
+    public double getMaxTimeInQu() {
+        return MaxTimeInQu;
+    }
+
+    public double getAvgNumInQue() {
+        return AvgNumInQue;
+    }
+
+    public int getMaxNumInQu() {
+        return MaxNumInQu;
+    }
+
+    public double getAvgServersBusyPercent() {
+        return AvgServersBusyPercent;
+    }
+
+    public int getNumServed() {
+        return NumServed;
+    }
+
+    public int getNumLost() {
+        return NumLost;
+    }
+
+    public double getNumLostPercent() {
+        return NumLostPercent;
+    }
 }
