@@ -1,5 +1,7 @@
 package org.example.lab2;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class AnalisysOfModeling {
@@ -272,10 +274,15 @@ public class AnalisysOfModeling {
                 Fin7.add(Math.pow(smoIn.getMeanServeTime(), 2));
                 Fin8.add(smoIn.getMeanServeTime() * Double.valueOf(smoIn.getNumServers()));
                 Fin9.add(Math.pow(Double.valueOf(smoIn.getNumServers()), 2));
-                Fin10.add(getParam(smo, (int)Math.round(Borders.get(0))));
+                Fin10.add(getParam(smo, (int)Math.round(Borders.get(0))));//y
                 Fin11.add(getParam(smo, (int)Math.round(Borders.get(2))));
             }
             printSecondTab();
+            try {
+                saveValues();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -331,4 +338,59 @@ public class AnalisysOfModeling {
         }
         return retStatment;
     }
+
+    public void saveValues() throws IOException {
+        FileWriter x1 = new FileWriter("x1.txt");
+        FileWriter x2 = new FileWriter("x2.txt");
+        FileWriter x3 = new FileWriter("x3.txt");
+        FileWriter x4 = new FileWriter("x4.txt");
+        FileWriter x5 = new FileWriter("x5.txt");
+        FileWriter x6 = new FileWriter("x6.txt");
+        FileWriter x7 = new FileWriter("x7.txt");
+        FileWriter x8 = new FileWriter("x8.txt");
+        FileWriter x9 = new FileWriter("x9.txt");
+        FileWriter y1 = new FileWriter("y1.txt");
+        FileWriter y2 = new FileWriter("y2.txt");
+
+
+        for (int i = 0; i < genFinAmount; ++i) {
+            x1.write(finTab.get(0).get(i)+" ");
+            x2.write(finTab.get(1).get(i)+" ");
+            x3.write(finTab.get(2).get(i)+" ");
+            x4.write(finTab.get(3).get(i)+" ");
+            x5.write(finTab.get(4).get(i)+" ");
+            x6.write(finTab.get(5).get(i)+" ");
+            x7.write(finTab.get(6).get(i)+" ");
+            x8.write(finTab.get(7).get(i)+" ");
+            x9.write(finTab.get(8).get(i)+" ");
+            y1.write(finTab.get(9).get(i)+" ");
+            y2.write(finTab.get(10).get(i)+" ");
+        }
+        x1.flush();
+        x2.flush();
+        x3.flush();
+        x4.flush();
+        x5.flush();
+        x6.flush();
+        x7.flush();
+        x8.flush();
+        x9.flush();
+        y1.flush();
+        y2.flush();
+
+        x1.close();
+        x2.close();
+        x3.close();
+        x4.close();
+        x5.close();
+        x6.close();
+        x7.close();
+        x8.close();
+        x9.close();
+        y1.close();
+        y2.close();
+    }
+
+
+    //=1 - (1 - C244)*((C247-1)/(C247-4))
 }
