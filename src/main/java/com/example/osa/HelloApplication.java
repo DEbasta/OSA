@@ -122,11 +122,6 @@ public class HelloApplication extends Application {
         XYChart.Series series58 = new XYChart.Series();
         XYChart.Series series59 = new XYChart.Series();
 
-
-
-
-
-
         cut1.getData().add(new XYChart.Data<>(sp.getSpCalculations().getLeftCuts().get(0), 1));
         cut1.getData().add(new XYChart.Data<>(sp.getSpCalculations().getRightCuts().get(0),1));
         cut2.getData().add(new XYChart.Data<>(sp.getSpCalculations().getLeftCuts().get(1), 2));
@@ -353,9 +348,9 @@ public class HelloApplication extends Application {
     }
 
     public static void main(String[] args) {
-        //FirstPage fp = new FirstPage();
-        //launch();
-        AnalisysOfModeling analisysOfModeling = new AnalisysOfModeling();
+        //FirstPage fp = new FirstPage();     //lab1 list1
+        //launch();   //lab1 list2
+        //AnalisysOfModeling analisysOfModeling = new AnalisysOfModeling();   //lab2
 
 
     }
