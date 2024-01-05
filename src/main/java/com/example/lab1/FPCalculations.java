@@ -40,11 +40,11 @@ public class FPCalculations {
         System.out.println();
         System.out.println("Ranks 1 | Ranks 2");
         for ( int i = 0; i < N; ++i) {
-            System.out.println(AZad[i] + " " + Ranks[i]);
+            System.out.println(AFirst[i] + " " + Ranks[i]);
         }
         System.out.println();
         System.out.println("Coeficeint of Correlation");
-        System.out.println(-CoefCorrel);
+        System.out.println(CoefCorrel);
         System.out.println("---------------------------------------------------------------------------------------------");
     }
 

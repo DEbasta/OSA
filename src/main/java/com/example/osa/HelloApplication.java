@@ -9,7 +9,9 @@ import javafx.scene.chart.*;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 public class HelloApplication extends Application {
     @Override
